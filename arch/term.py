@@ -7,7 +7,7 @@ class Term:
 	def get_id(self):
 		return self._ID
 
-	def getValue(self):
+	def get_value(self):
 		return self._value
 
 	def set_value(self, value)
