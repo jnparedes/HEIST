@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <!-- May want to use these at some point
+    <link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon-57x57.png">
+    <link rel="apple-touch-startup-image" href="/splash-startup.png">
+    -->
+    <title>Logic to SQL</title>
+    <script>
+      (function(i,s,o,g,r,a,m){i["GoogleAnalyticsObject"]=r;i[r]=i[r]||
+      function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=
+      s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;
+      m.parentNode.insertBefore(a,m)})(window,document,"script",
+      "//www.google-analytics.com/analytics.js","ga");
+      ga("create", "UA-45800576-1", "srjallan.com"); ga("send", "pageview");
+    </script>
+    <script src="//code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="/static/ace/src-min-noconflict/ace.js"></script>
+    <script src="/static/main.js"></script>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+    <link rel="stylesheet" href="/static/main.css">
+  </head>
+
+  <body>
+    <header>
+      <nav>
+        <ul>
+          <li id="query">
+            <a href="#query" id="nav_query">
+              <i class="fa fa-search"></i><span>Query</span>
+            </a>
+          </li>
+          <li id="help">
+            <a href="#help" id="nav_help">
+              <i class="fa fa-question"></i><span>Help</span>
+            </a>
+          </li>
+          <li id="settings">
+            <a href="#settings" id="nav_settings">
+              <i class="fa fa-cog"></i><span>Settings</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <div id="main_container">
+      <div id="query_container" class="window hidden">
+        <section id="schema_section">
+        </section>
+
+        <section id="logic_section">
+          <div id="demo_container">
+            <span>Demo:</span>
+            <button id="demo1">1</button>
+            <button id="demo2">2</button>
+            <button id="demo3">3</button>
+            <button id="demo4">4</button>
+          </div>
+          <div id="insert_container">
+            <span>Click to insert:</span>
+            <button id="not_button">&not;</button>
+            <button id="and_button">&and;</button>
+            <button id="or_button">&or;</button>
+            <button id="implies_button">&rarr;</button>
+            <button id="iff_button">&harr;</button>
+            <button id="exists_button">&exist;</button>
+            <button id="forall_button">&forall;</button>
+            <button id="equal_button">=</button>
+            <button id="not_equal_button">&ne;</button>
+            <button id="less_button">&lt;</button>
+            <button id="less_equal_button">&le;</button>
+            <button id="greater_button">&gt;</button>
+            <button id="greater_equal_button">&ge;</button>
+          </div>
+          <form id="logic_form" name="logic_form" action="/" method="post">
+            <div id="logic">∃x(films.title(x, y) ∧ films.director(x, z))</div>
+            <button type="submit" id="translate_button">
+              <i class="fa fa-bolt"></i><span>Translate to SQL</span>
+            </button>
+          </form>
+        </section>
+
+        <section id="errors_section">
+          <div id="errors_container" class="status">
+            <div class="no_errors">
+              <i class="fa fa-check-circle"></i>
+              <span>Console</span>
+            </div>
+          </div>
+        </section>
+
+        <section id="results_section">
+          <div id="sql">-- SQL query will appear here</div>
+          <div id="results_table"></div>
+        </section>
+      </div>
+
+      <div id="help_container" class="window hidden">
+        <strong>Instructions</strong>
+        <p>
+          Input a logical statement in the 'Logic box'
+          An example statement would be of the form:
+        </p>
+        <ul>
+          <li>&#8707;key(&lt;table_name&gt;.&lt;field_name&gt;(key,value))</li>
+        </ul>
+        <p>
+          The above query binds 'key' to be a row in the table_name specified, 
+          Any unbound variables in the predicate then act as selectors for the 
+          corresponding SELECT SQL query. I.E. the above query will return every field_name
+          in table_name for which there is a value for field_name. this is an example of
+          project field_name (tablename) in relational algebra.
+        </p>
+        <p>
+          Use the buttons to input the logical symbols, or if you are a wizard you can
+          use the following shortcuts:
+        </p>
+        <ul>
+          <li>typing '\A' inserts a for all symbol, &forall;</li>
+          <li>typing '\E' inserts a there exists symbol, &exist;</li>
+          <li>typing '/\' inserts an and symbol, &and;</li>
+          <li>typing '\/' inserts an or symbol, &or;</li>
+          <li>typing '<->' inserts an if and only if symbol, &harr;</li>
+          <li>typing '->' inserts an implies symbol, &rarr;</li>
+        </ul>
+      </div>
+
+      <div id="settings_container" class="window hidden">
+        <section id="settings_section">
+          <form id="settings_form" action="/settings" method="post">
+            <div>
+              <span>Server Address:</span>
+              <input type="text" id="settings_server">
+            </div>
+            <div>
+              <span>Server Port:</span>
+              <input type="text" id="settings_port" value="5432">
+            </div>
+            <div>
+              <span>DB Username:</span>
+              <input type="text" id="settings_username">
+            </div>
+            <div>
+              <span>DB Password:</span>
+              <input type="password" id="settings_password">
+            </div>
+            <div>
+              <span>DB Name:</span>
+              <input type="text" id="settings_dbname">
+            </div>
+            <button type="submit" id="connect_button">
+              <i class="icon icon-db"></i><span>Connect to DB</span>
+            </button>
+          </form>
+        </section>
+        <section id="settings_result_section" class="hidden">
+          <div id="settings_result_container" class="status">
+            <div id="settings_result_line" class="no_errors">
+              <i class="fa fa-check-circle"></i>
+              <span id="settings_result_message"></span>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </body>
+
+</html>

@@ -2,5 +2,5 @@ from enum import Enum
 
 class Quantifier(Enum):
 
-	EXISTENTIAL = "existential"
+	EXISTENTIAL = "∃"
 	UNIVERSAL = "universal"

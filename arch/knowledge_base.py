@@ -4,9 +4,14 @@ class KnowledgeBase:
 		self._rules = rules
 		self._atoms = atoms
 
-	def getData(self):
+	def get_data(self):
 		return self._atoms
 	
-	def getRules(self):
+	def set_data(self, atoms):
+		self._atoms = atoms
+
+	def get_rules(self):
 		return self._rules
 
+	def set_rules(self, rules):
+		self._rules = rules

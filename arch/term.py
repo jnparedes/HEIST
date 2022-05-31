@@ -10,5 +10,5 @@ class Term:
 	def get_value(self):
 		return self._value
 
-	def set_value(self, value)
+	def set_value(self, value):
 		self._value = value

@@ -1,0 +1,1 @@
+(persona(x) ∧ empresa(y) ∧ trabaja_en(x,y))
