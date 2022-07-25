@@ -1,4 +1,3 @@
-#from Ontological.OntQuery import OntQuery
 from ontological_netder.netder_query import NetDERQuery
 from constant import Constant
 from variable import Variable
