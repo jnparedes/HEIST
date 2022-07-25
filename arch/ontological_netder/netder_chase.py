@@ -1,16 +1,15 @@
-import os, sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 import copy
 import bisect
 import hashlib
 from datetime import datetime
-from Ontological.Variable import Variable
-from Ontological.Null import Null
-from Ontological.RDBHomomorphism import RDBHomomorphism
-from Diffusion_Process.NetDiffProgram import NetDiffProgram
-from Diffusion_Process.NetDiffInterpretation import NetDiffInterpretation
-from Diffusion_Process.NetDiffFact import NetDiffFact
+from variable import Variable
+from ontological_netder.null import Null
+from ontological_netder.rdb_homomorphism import RDBHomomorphism
+from diffusion_process.netdiff_program import NetDiffProgram
+from diffusion_process.netdiff_interpretation import NetDiffInterpretation
+from diffusion_process.netdiff_fact import NetDiffFact
 from reasoning_task import ReasoningTask
+from quantifier import Quantifier
 
 class NetDERChase(ReasoningTask):
 	contador = 0
@@ -165,11 +164,11 @@ class NetDERChase(ReasoningTask):
 					null = self._kb.create_null()
 					for other_atom in possibility:
 						#se aplica el mapeo a cada atomo, para asignar el Null creado anteriormente
-						other_atom.map({variable.getId(): null})
+						other_atom.map({variable.get_id(): null})
 						self._kb.save_null_info(other_atom, null)
 					for nct in net_head_result[index]:
 						#se aplica el mapeo a cada componente de red de la cabeza, para asignar el Null creado anteriormente
-						nct.getComponent().map({variable.getId(): null})
+						nct.getComponent().map({variable.get_id(): null})
 						self._kb.save_null_info(nct.getComponent(), null)
 			#los atomos de la parte ontologica de la cabeza de la tgd totalmente mapeados se almacenan en la primer posicion de "aux_result"
 			aux_result[0] = aux_result[0].union(set(possibility))
@@ -183,7 +182,7 @@ class NetDERChase(ReasoningTask):
 				for variable in nct.getComponent().get_variables():
 					null = self._kb.create_null()
 					for nct in possibility:
-						nct.getComponent().map({variable.getId(): null})
+						nct.getComponent().map({variable.get_id(): null})
 						self._kb.save_null_info(nct.getComponent(), null)
 				net_diff_knwl.add(NetDiffFact(nct.getComponent(), nct.getLabel(), nct.getBound(), time[0], time[1]))
 				net_diff_knwl.add(nct.getComponent())
@@ -221,7 +220,7 @@ class NetDERChase(ReasoningTask):
 						#paso (6.4): caso contrario la EGD no se satisface.
 						#paso (6.4): Por ejemplo, si se tiene la copia (a) = p(z_1, z_2, a) y la copia (b) p(z_3, b, a) cumplen porque
 						#paso (6.4): para el par "z_1" y "z_2" ambos son nulls, para el par "z_2" y "b" el primero es null, y para el par "a" y "a" son iguales
-						head = copy.deepcopy(egd.get_head())
+						head = copy.deepcopy(egd.get_ont_head())
 						#paso (1)
 						cloned_ont_body1 = copy.deepcopy(egd.get_ont_body())
 						cloned_net_body1 = copy.deepcopy(egd.get_net_body())
@@ -230,28 +229,28 @@ class NetDERChase(ReasoningTask):
 						
 						for atom in cloned_ont_body1:
 							#paso (2) en la parte ontologica
-							atom.map({head[0].getId(): head[1]})
+							atom.map({head[0].get_id(): head[1]})
 							#paso (3) en la parte ontologica
 							atom.map(mappings[key_index][key])
 
 						for nct in cloned_net_body1:
 							#paso (2) en la parte de red
-							nct.getComponent().map({head[0].getId(): head[1]})
+							nct.getComponent().map({head[0].get_id(): head[1]})
 							#paso (3) en la parte de red
 							nct.getComponent().map(mappings[key_index][key])
 
-						head = copy.deepcopy(egd.get_head())
+						head = copy.deepcopy(egd.get_ont_head())
 
 						
 						for atom in cloned_ont_body2:
 							#paso (4) en la parte ontologica
-							atom.map({head[1].getId(): head[0]})
+							atom.map({head[1].get_id(): head[0]})
 							#paso (5) en la parte ontologica
 							atom.map(mappings[key_index][key])
 						
 						for nct in cloned_net_body2:
 							#paso (4) en la parte de red
-							nct.getComponent().map({head[1].getId(): head[0]})
+							nct.getComponent().map({head[1].get_id(): head[0]})
 							#paso (5) en la parte de red
 							nct.getComponent().map(mappings[key_index][key])
 							
@@ -261,21 +260,20 @@ class NetDERChase(ReasoningTask):
 							for term in cloned_ont_body1[index].get_terms():
 								#paso (6.2) para la parte ontologica
 								other_term = cloned_ont_body2[index].get_terms()[term_i]
-								if term.getValue() != other_term.getValue():
+								if term.get_value() != other_term.get_value():
 									if term.can_be_instanced():
-										if other_term.can_be_instanced() and term.getValue() < other_term.getValue():
+										if other_term.can_be_instanced() and term.get_value() < other_term.get_value():
 											#reemplazar "other_term" por "term" ya que "term" esta lexicograficamente antes "other_term"
-											new_mapping[other_term.getValue()] = term
+											new_mapping[other_term.get_value()] = term
 										else:
 											#reemplazar "term" por "other_term" ya que "other_term" esta lexicograficamente antes "term"
-											new_mapping[term.getValue()] = other_term
+											new_mapping[term.get_value()] = other_term
 										
 									#paso (6.2) para la parte ontologica
 									elif other_term.can_be_instanced():
 										#se construye un mapeo para actualizar la BD
-										new_mapping[other_term.getValue()] = term
+										new_mapping[other_term.get_value()] = term
 									#paso (6.3) para la parte ontologica
-									#elif (not term.getValue() == cloned_ont_body2[index].get_terms()[term_i].getValue()):
 									else:
 										#los terminos no son iguales y ninguno de los dos es null (no puede ser instanciado)
 										#paso (6.4) para la parte ontologica
@@ -292,21 +290,20 @@ class NetDERChase(ReasoningTask):
 								for term in cloned_net_body1[index].getComponent().get_terms():
 									#paso (6.2) para la parte de red
 									other_term = cloned_net_body2[index].getComponent().get_terms()[term_i]
-									if term.getId() != other_term.getId():
+									if term.get_id() != other_term.get_id():
 										if term.can_be_instanced():
-											if other_term.can_be_instanced() and term.getValue() < other_term.getValue():
+											if other_term.can_be_instanced() and term.get_value() < other_term.get_value():
 												#reemplazar "other_term" por "term" ya que "term" esta lexicograficamente antes "other_term"
-												new_mapping[other_term.getValue()] = term
+												new_mapping[other_term.get_value()] = term
 											else:
 												#reemplazar "term" por "other_term" ya que "other_term" esta lexicograficamente antes "term"
-												new_mapping[term.getValue()] = other_term
+												new_mapping[term.get_value()] = other_term
 										
 										#paso (6.2) para la parte de red
 										elif other_term.can_be_instanced():
 											#se construye un mapeo para actualizar la BD
-											new_mapping[other_term.getValue()] = term
+											new_mapping[other_term.get_value()] = term
 										#paso (6.3) para la parte de red
-										#elif (not term.getValue() == cloned_net_body2[index].getComponent().get_terms()[term_i].getValue()):
 										else:
 											#paso (6.4) para la parte de red
 											success = False
@@ -377,7 +374,7 @@ class NetDERChase(ReasoningTask):
 					mapping = {}
 					#se buscan todos los mapeos para la consulta
 					for q in query.get_disjoint_queries():
-						q_mapping = self._get_atoms_mapping(q.get_ont_body())
+						q_mapping = self._get_atoms_mapping(q.get_ont_cond())
 						for mapping_item in q_mapping:
 							for key in mapping_item:
 								mapping[key] = mapping_item[key]
@@ -406,7 +403,8 @@ class NetDERChase(ReasoningTask):
 		for key_pos in mapping.keys():
 			aux_result_mapping = {}
 			for key in mapping[key_pos].keys():
-				if not (Variable(key) in query.get_exist_var()):
+				exist_var = query.get_quantification()[Quantifier.EXISTENTIAL]
+				if not (Variable(key) in exist_var):
 					aux_result_mapping[key] = mapping[key_pos][key]
 			if len(aux_result_mapping) > 0:
 				result.append(aux_result_mapping)

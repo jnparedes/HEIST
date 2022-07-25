@@ -1,4 +1,4 @@
-from label import Label
+from diffusion_process.label import Label
 
 class ELocalLabel(Label):
 

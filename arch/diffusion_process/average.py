@@ -1,4 +1,4 @@
-from abstract_agregation_function import AbstractAgregationFunction
+from diffusion_process.abstract_agregation_function import AbstractAgregationFunction
 import portion
 
 class Average(AbstractAgregationFunction):

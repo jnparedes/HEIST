@@ -1,4 +1,5 @@
 from quantifier import Quantifier
+import copy
 
 class Query:
 
@@ -20,10 +21,12 @@ class Query:
 
 	def get_variables(self):
 		result = []
-		for atom in self._atoms:
-			for var in atom.get_variables():
-					var_copy = copy.deepcopy(var)
-					result.append(var_copy)
+		for key in self._atoms:
+			for atom in self._atoms[key]:
+				for var in atom.get_variables():
+					if not var in result:
+						var_copy = copy.deepcopy(var)
+						result.append(var_copy)
 
 		return result
 
@@ -43,16 +46,17 @@ class Query:
 		quantification = self._quantification
 		exist_var = quantification[Quantifier.EXISTENTIAL]
 		if len(exist_var) > 0:
-			result = result + Quantifier.EXISTENTIAL
+			result = result + Quantifier.EXISTENTIAL.value
 			for var in exist_var:
-				result = result + var.getId() + ','
+				result = result + var.get_id() + ','
 			#saco la coma que sobra
 			result = result[:-1]
 		
 		result = result + '('
 
-		for atom in self._atoms:
-			result = result + str(atom) + '∧'
+		for key in self._atoms:
+			for atom in self._atoms[key]:
+				result = result + str(atom) + '∧'
 
 		#saco ∧ que sobra y agrego de perentesis de cierre
 		result = result[:-1] + ')'

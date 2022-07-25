@@ -1,6 +1,4 @@
-import os, sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-from netder_rule import NetDERRule
+from ontological_netder.netder_rule import NetDERRule
 
 class NetDERTGD(NetDERRule):
 

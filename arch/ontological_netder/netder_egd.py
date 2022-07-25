@@ -1,4 +1,4 @@
-from Ontological.NetDERRule import NetDERRule
+from ontological_netder.netder_rule import NetDERRule
 
 class NetDEREGD(NetDERRule):
 

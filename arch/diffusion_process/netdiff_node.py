@@ -1,29 +1,22 @@
 import random
 from diffusion_process.netdiff_graph_element import NetDiffGraphElement
+from constant import Constant
 
 class NetDiffNode(NetDiffGraphElement):
-
+	ID = "node"
+	
 	def __init__(self, id):
 		self._id = id
-		self._color = "blue"
+		super().__init__("node", [Constant(str(id))])
 
 	def get_labels(self):
 		return NetDiffNode._labels
 
-	def __str__(self):
-		return 'node(' + self._id + ')'
-
 	def __hash__(self):
-		return hash(str(self))
+		return NetDiffGraphElement.__hash__(self)
 
 	def to_json_string(self):
-		return '{"id":"' + str(self._id) + '", "label": "' + str(self._id) + '", "color": "' + self._color + '" }'
-
-	def set_color(self, color):
-		self._color = color
-
-	def get_color(self):
-		return self._color
+		return '{"id":"' + str(self._id) + '", "label": "' + str(self._id) + '" }'
 
 	def getId(self):
 		return self._id

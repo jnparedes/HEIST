@@ -6,8 +6,8 @@ from networkx import Graph
 class NetDiffGraph(NetDiffGraphElement, Graph):
 
 	def __init__(self, id, nodes = [], edges = []):
-		super().__init__()
-		self._id = id
+		NetDiffGraphElement.__init__(self, id, [])
+		Graph.__init__(self)
 		for node in nodes:
 			self.add_node(node)
 
@@ -62,19 +62,8 @@ class NetDiffGraph(NetDiffGraphElement, Graph):
 		super().add_edges_from([(net_diff_node1, net_diff_node2, {"net_diff_edge": net_diff_edge})])
 
 	def getId(self):
-		return self._id
+		return self._symbol
 
 	def __str__(self):
-		return self._id
-
-	'''def get_neighbours(self, node):
-		result = []
-
-		for edge in self._netDiffEdges:
-			if (edge.getTarget() == node.getId()):
-				result.append(NetDiffNode(edge.getSource()))
-			elif (edge.getSource() == node.getId()):
-				result.append(NetDiffNode(edge.getTarget()))
-
-		return result'''
+		return self._symbol
 

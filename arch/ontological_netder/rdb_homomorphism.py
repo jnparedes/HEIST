@@ -1,9 +1,12 @@
-from Ontological.OntQuery import OntQuery
-from Ontological.Constant import Constant
-from Ontological.Variable import Variable
-from Ontological.Atom import Atom
-from Ontological.Homomorphism import Homomorphism
-from Ontological.Null import Null
+#from Ontological.OntQuery import OntQuery
+from ontological_netder.netder_query import NetDERQuery
+from constant import Constant
+from variable import Variable
+from query import Query
+from quantifier import Quantifier
+from atom import Atom
+from ontological_netder.homomorphism import Homomorphism
+from ontological_netder.null import Null
 from ATLAST.parsing import parser
 from ATLAST.codegen.symtable import SymTable
 from ATLAST.codegen.ir_generator import IRGenerator
@@ -33,13 +36,14 @@ class Mapping:
 				new_mapping = {}
 				index = 0
 				key_mapping = ""
+
 				for term in self._terms:
 					value = self._data[self._position][index]
 					if str(value)[:1] == "z" and str(value)[1:].isdigit():
-						new_mapping[term.getId()] = Null(value)
+						new_mapping[term.get_id()] = Null(value)
 					else:
-						new_mapping[term.getId()] = Constant(value)
-					key_mapping = key_mapping + '(' + str(term.getId()) + ',' + str(new_mapping[term.getId()]) + ')'
+						new_mapping[term.get_id()] = Constant(value)
+					key_mapping = key_mapping + '(' + str(term.get_id()) + ',' + str(new_mapping[term.get_id()]) + ')'
 					index += 1
 	            
 				result[key_mapping] = new_mapping
@@ -64,7 +68,7 @@ class RDBHomomorphism(Homomorphism):
 		inicio_trans = datetime.now()
 		string_query = str(query)
 		if not (string_query in self._sql_queries):
-			result = parser.parse_input(str(query))
+			result = parser.parse_input(string_query)
 			# Set up a symbol table and code generation visitor
 		
 			symbolTable = SymTable()
@@ -98,7 +102,8 @@ class RDBHomomorphism(Homomorphism):
 			pk_variable = atom.get_pk_variable()
 			if not pk_variable is None:
 				exist_var.append(pk_variable)
-		query = OntQuery(exist_var = exist_var, ont_cond = atoms)
+
+		query = Query(quantification = {Quantifier.EXISTENTIAL: exist_var}, atoms = {"ont_cond":atoms})
 		
 		sql_query = self.to_SQL(query)
 		

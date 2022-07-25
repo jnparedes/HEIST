@@ -1,4 +1,4 @@
-from Ontological.Term import Term
+from term import Term
 import hashlib
 
 class ExpressionPlus:

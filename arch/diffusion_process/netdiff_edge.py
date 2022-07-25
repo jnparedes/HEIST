@@ -1,23 +1,23 @@
-from netdiff_graph_element import NetDiffGraphElement
+from diffusion_process.netdiff_graph_element import NetDiffGraphElement
+from constant import Constant
 
 class NetDiffEdge(NetDiffGraphElement):
+	ID = "edge"
 
 	def __init__(self, source, target):
 		self._source = source
 		self._target = target
 		self._id = "(" + source + ',' + target + ')'
+		super().__init__("edge", [Constant(str(source)), Constant(str(target))])
 	
 	def get_labels(self):
 		return NetDiffEdge._labels
 
 	def __str__(self):
 		return 'edge' + self._id
-
-	def __hash__(self):
-		return str(self)
 	
 	def to_json_string(self):
-		return '{"id":"'+ str(self._id) +'", "from":'+ str(self._source) + ', "to":' + str(self._target) + ', "color": "black" ' + '}'
+		return '{"id":"'+ str(self._id) +'", "from":'+ str(self._source) + ', "to":' + str(self._target) + '}'
 
 	def getSource(self):
 		return self._source
@@ -36,3 +36,6 @@ class NetDiffEdge(NetDiffGraphElement):
 			result = result or (self._source == edge.getSource() and self._target == edge.getTarget())
 
 		return result
+
+	def __hash__(self):
+		return super().__hash__()

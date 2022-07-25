@@ -1,4 +1,4 @@
-from netder_atom import Atom
+from atom import Atom
 
 class Distinct(Atom):
 
@@ -13,3 +13,6 @@ class Distinct(Atom):
 
 	def get_mapping(self, atom):
 		return {}
+
+	def __str__(self):
+		return str(self._terms[0]) + ' ≠ ' + str(self._terms[1])

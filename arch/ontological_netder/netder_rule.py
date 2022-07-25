@@ -19,3 +19,9 @@ class NetDERRule(Rule):
 
 	def get_net_head(self):
 		return self._head["net_head"]
+
+	def get_ont_body(self):
+		return self._body["ont_body"]
+
+	def get_net_body(self):
+		return self._body["net_body"]

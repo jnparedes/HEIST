@@ -1,0 +1,169 @@
+<?xml version="1.0"?>
+<root>
+<dbname>
+	test
+</dbname>
+<table name = "closer">
+	<primaryKey>
+		1_primary_key
+	</primaryKey>
+	<primaryKey>
+		2_id
+	</primaryKey>
+	<primaryKey>
+		3_id
+	</primaryKey>
+</table>
+
+<table name = "early_poster">
+	<primaryKey>
+		1_primary_key
+	</primaryKey>
+	<primaryKey>
+		2_id
+	</primaryKey>
+	<primaryKey>
+		3_noticia
+	</primaryKey>
+</table>
+
+<table name = "news_category">
+	<primaryKey>
+		1_primary_key
+	</primaryKey>
+	<primaryKey>
+		2_noticia
+	</primaryKey>
+	<primaryKey>
+		3_categoria
+	</primaryKey>
+</table>
+
+<table name = "pre_hyp_fakenews">
+	<primaryKey>
+		1_primary_key
+	</primaryKey>
+	<primaryKey>
+		2_noticia
+	</primaryKey>
+</table>
+
+<table name = "pre_hyp_fakenews2">
+	<primaryKey>
+		1_primary_key
+	</primaryKey>
+	<primaryKey>
+		2_noticia
+	</primaryKey>
+</table>
+
+<table name = "hyp_botnet">
+	<primaryKey>
+		1_primary_key
+	</primaryKey>
+	<primaryKey>
+		2_id
+	</primaryKey>
+</table>
+
+
+<table name = "hyp_fakenews">
+	<primaryKey>
+		1_primary_key
+	</primaryKey>
+	<primaryKey>
+		2_noticia
+	</primaryKey>
+</table>
+
+<table name = "hyp_is_resp">
+	<primaryKey>
+		1_primary_key
+	</primaryKey>
+	<primaryKey>
+		2_id
+	</primaryKey>
+	<primaryKey>
+		3_noticia
+	</primaryKey>
+</table>
+
+<table name = "hyp_malicious">
+	<primaryKey>
+		1_primary_key
+	</primaryKey>
+	<primaryKey>
+		2_id
+	</primaryKey>
+</table>
+
+<table name = "member">
+	<primaryKey>
+		1_primary_key
+	</primaryKey>
+	<primaryKey>
+		2_id_user
+	</primaryKey>
+	<primaryKey>
+		3_botnet
+	</primaryKey>
+</table>
+
+<table name = "news">
+	<primaryKey>
+		1_primary_key
+	</primaryKey>
+	<primaryKey>
+		2_content
+	</primaryKey>
+	<primaryKey>
+		3_fn_level
+	</primaryKey>
+</table>
+
+<table name = "node">
+	<primaryKey>
+		1_primary_key
+	</primaryKey>
+	<primaryKey>
+		2_id
+	</primaryKey>
+</table>
+
+<table name = "edge">
+	<primaryKey>
+		1_primary_key
+	</primaryKey>
+	<primaryKey>
+		2_from
+	</primaryKey>
+	<primaryKey>
+		3_to
+	</primaryKey>
+</table>
+
+<table name = "net_diff_fact">
+	<primaryKey>
+		1_primary_key
+	</primaryKey>
+	<primaryKey>
+		2_component
+	</primaryKey>
+	<primaryKey>
+		3_label
+	</primaryKey>
+	<primaryKey>
+		4_interval_lower
+	</primaryKey>
+	<primaryKey>
+		5_interval_upper
+	</primaryKey>
+	<primaryKey>
+		6_t_lower
+	</primaryKey>
+	<primaryKey>
+		7_t_upper
+	</primaryKey>
+</table>
+
+</root>

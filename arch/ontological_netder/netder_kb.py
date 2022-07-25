@@ -4,17 +4,17 @@ import copy
 import json
 import mariadb
 import portion
-from Ontological.Variable import Variable
-from Ontological.Constant import Constant
-from Ontological.Atom import Atom
-from Ontological.Null import Null
-from Ontological.RDBHomomorphism import RDBHomomorphism
-from Diffusion_Process.NetDiffFact import NetDiffFact
-from Diffusion_Process.NLocalLabel import NLocalLabel
-from Diffusion_Process.ELocalLabel import ELocalLabel
-from Diffusion_Process.NetDiffNode import NetDiffNode
-from Diffusion_Process.NetDiffEdge import NetDiffEdge
-from Diffusion_Process.NetDiffGraph import NetDiffGraph
+from variable import Variable
+from constant import Constant
+from atom import Atom
+from ontological_netder.null import Null
+from ontological_netder.rdb_homomorphism import RDBHomomorphism
+from diffusion_process.netdiff_fact import NetDiffFact
+from diffusion_process.n_local_label import NLocalLabel
+from diffusion_process.e_local_label import ELocalLabel
+from diffusion_process.netdiff_node import NetDiffNode
+from diffusion_process.netdiff_edge import NetDiffEdge
+from diffusion_process.netdiff_graph import NetDiffGraph
 from ATLAST.dbbackend.schema import Schema
 from knowledge_base import KnowledgeBase
 
@@ -42,8 +42,7 @@ class NetDERKB(KnowledgeBase):
 
 		nodes = net_diff_graph.getNodes()
 		edges = net_diff_graph.getEdges()
-		data = data.union(nodes)
-		data = data.union(edges)
+		data = nodes + edges
 		self._load_schema()
 		con = self.get_connection()
 		self._load_tuples_id(con)
@@ -119,27 +118,27 @@ class NetDERKB(KnowledgeBase):
 			sql_query_ini = 'INSERT INTO '
 			sql_queries_part = {}
 			for atom in filtered_atoms:
-				if not (atom.getId() in sql_queries_part):
-					sql_queries_part[atom.getId()] = ' VALUES '
+				if not (atom.get_symbol() in sql_queries_part):
+					sql_queries_part[atom.get_symbol()] = ' VALUES '
 				
-				sql_queries_part[atom.getId()] = sql_queries_part[atom.getId()] + '(' + "'" + str(hash(atom)) + "',"
+				sql_queries_part[atom.get_symbol()] = sql_queries_part[atom.get_symbol()] + '(' + "'" + str(hash(atom)) + "',"
 				for term in atom.get_terms():
-					string_value = str(term.getValue())
+					string_value = str(term.get_value())
 					#saco cualquier caracter de escape que pueda contener
 					string_value = string_value.replace("\\", "")
 					#si contiene algun simbolo ' se le antepone el simbolo \
 					string_value = string_value.replace("'", "\\'")
-					sql_queries_part[atom.getId()] = sql_queries_part[atom.getId()] + "'" + string_value + "',"
+					sql_queries_part[atom.get_symbol()] = sql_queries_part[atom.get_symbol()] + "'" + string_value + "',"
 				#saco la coma que queda demas
-				sql_queries_part[atom.getId()] = sql_queries_part[atom.getId()][:-1]
-				sql_queries_part[atom.getId()] = sql_queries_part[atom.getId()] + '),'
+				sql_queries_part[atom.get_symbol()] = sql_queries_part[atom.get_symbol()][:-1]
+				sql_queries_part[atom.get_symbol()] = sql_queries_part[atom.get_symbol()] + '),'
 
 			for key in sql_queries_part.keys():
 				#saco la coma que queda demas
 				sql_queries_part[key] = sql_queries_part[key][:-2]
 				sql_queries_part[key] = sql_queries_part[key] + ')'
 				sql_query = sql_query_ini + '`' + key + '`' + sql_queries_part[key]
-	
+				
 				cur.execute(sql_query)
 			success = True
 		else:
@@ -158,6 +157,7 @@ class NetDERKB(KnowledgeBase):
 		tables = {"net_diff_fact": {"name":NetDiffFact.ID}, "node": {"name":NetDiffNode.ID}, "edge": {"name":NetDiffEdge.ID}}
 		for key in tables.keys():
 			column_query = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '"+ tables[key]["name"] + "' ORDER BY ORDINAL_POSITION"
+			
 			cur.execute(column_query)
 			columns = cur.fetchall()
 			tables[key]["pk_col"] = columns[0][0]
@@ -231,7 +231,7 @@ class NetDERKB(KnowledgeBase):
 
 	def save_null_info(self, atom, null):
 		if atom.is_present(null):
-			null_info_atom = Atom(str(NetDERKB.NULL_INFO), [Constant(str(null.getValue())), Constant(str(atom.getId())), Constant(str(hash(atom)))])
+			null_info_atom = Atom(str(NetDERKB.NULL_INFO), [Constant(str(null.get_value())), Constant(str(atom.get_symbol())), Constant(str(hash(atom)))])
 			self.add_ont_data({null_info_atom})
 
 	def exists(self, connection, atom):
@@ -280,7 +280,7 @@ class NetDERKB(KnowledgeBase):
 								query_update_ini1 = "UPDATE " + table_name + " SET "
 								query_update_partial = ""
 								for index in range(len(other_columns)):
-									query_update_partial = query_update_partial + other_columns[index][0] + "='" + atom.get_terms()[index].getValue() + "', "
+									query_update_partial = query_update_partial + other_columns[index][0] + "='" + atom.get_terms()[index].get_value() + "', "
 
 								#quito la coma y el espacio demas
 								query_update_partial = query_update_partial[:-2]
@@ -288,7 +288,7 @@ class NetDERKB(KnowledgeBase):
 								
 								cur.execute(query_update1)
 
-								query_update2 = "UPDATE " + NetDERKB.NULL_INFO + " SET " + nulls_info_columns[1][0] + "='" + str(mapping[key].getValue()) + "' WHERE " + nulls_info_columns[0][0] + "='" + str(row[0]) + "';"
+								query_update2 = "UPDATE " + NetDERKB.NULL_INFO + " SET " + nulls_info_columns[1][0] + "='" + str(mapping[key].get_value()) + "' WHERE " + nulls_info_columns[0][0] + "='" + str(row[0]) + "';"
 								cur.execute(query_update2)
 							else:
 								query_delete1 = "DELETE FROM " + table_name + " WHERE " + pk_col + "='" + str(hash_bm) + "';"
@@ -316,14 +316,14 @@ class NetDERKB(KnowledgeBase):
 		cur.execute(node_sql)
 		node_data = cur.fetchall()
 		for data in node_data:
-			nodes.append(NetDiffNode(data[1]))
+			nodes.append(str(data[1]))
 		edges = []
 		edge_sql = h.to_SQL(edge)
 		cur.execute(edge_sql)
 		edge_data = cur.fetchall()
 
 		for data in edge_data:
-			edges.append(NetDiffEdge(data[1], data[2]))
+			edges.append((str(data[1]), str(data[2])))
 
 		net_diff_graph = NetDiffGraph("graph", nodes, edges)
 
@@ -337,15 +337,15 @@ class NetDERKB(KnowledgeBase):
 	def get_net_diff_graph(self):
 		return self._net_diff_graph
 
-	#def get_netder_egds(self):
-	#	return self._netder_egds
+	def get_netder_egds(self):
+		return self._netder_egds
 
-	#def get_netder_tgds(self):
-	#	return self._netder_tgds
+	def get_netder_tgds(self):
+		return self._netder_tgds
 
-	#def get_net_diff_lrules(self):
-	#	return self._netdiff_lrules
+	def get_net_diff_lrules(self):
+		return self._netdiff_lrules
 
-	#def get_net_diff_grules(self):
-	#	return self._netdiff_grules
+	def get_net_diff_grules(self):
+		return self._netdiff_grules
 

@@ -12,7 +12,7 @@ class EnhancedTipping(AbstractInfluenceFunction):
 		reduced_neigh = 0
 		for (c, world) in nas:
 			if c in neigh:
-				labels = c.getLabels()
+				labels = c.get_labels()
 				for l in labels:
 					if world.isSatisfied(l, portion.closed(1,1)):
 						reduced_neigh += 1
